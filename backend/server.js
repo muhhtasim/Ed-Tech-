@@ -138,6 +138,20 @@ app.delete('/delete-course/:id', (req, res) => {
     });
 });
 
+// Add a new course
+app.post('/add-course', (req, res) => {
+    const { title, price, category } = req.body;
+    const sql = "INSERT INTO courses (title, price, category) VALUES (?, ?, ?)";
+
+    mysql.query(sql, [title, price, category], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error adding course" });
+        }
+        res.status(200).json({ message: "Course added successfully!" });
+    });
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
