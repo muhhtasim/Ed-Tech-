@@ -1,17 +1,14 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, User, LogOut, PlusCircle } from 'lucide-react';
+import { BookOpen, User, LogOut, PlusCircle, BookMarked } from 'lucide-react'; // BookMarked আইকন যোগ করা হয়েছে
 
 const Navbar = () => {
-  // ১. ইউজার লগইন করা আছে কি না চেক করা
   const user = JSON.parse(localStorage.getItem('user'));
   const navigate = useNavigate();
 
-  // ২. লগআউট ফাংশন
   const handleLogout = () => {
     localStorage.removeItem('user');
     alert("Logged out successfully!");
-    // লগআউট করার পর পেজ রিলোড দিলে নেভবার অটোমেটিক আপডেট হয়ে যাবে
     window.location.href = '/login'; 
   };
 
@@ -27,13 +24,21 @@ const Navbar = () => {
       <ul style={ulStyle}>
         <li><Link to="/" style={linkStyle}>Home</Link></li>
         <li><Link to="/guideline" style={linkStyle}>Guideline</Link></li>
-        <li><Link to="/courses" style={linkStyle}>Courses</Link></li>
+        
+        {/* ইউজার লগইন থাকলে এবং সে স্টুডেন্ট হলে 'My Courses' দেখাবে */}
+        {user && user.role === 'student' && (
+          <li>
+            <Link to="/my-courses" style={myCoursesLinkStyle}>
+              <BookMarked size={18} /> My Courses
+            </Link>
+          </li>
+        )}
 
         {/* ৩. ইউজার লগইন থাকলে অপশনগুলো দেখাবে */}
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             
-            {/* 🔥 নতুন লজিক: শুধুমাত্র Admin হলে 'Add Course' দেখাবে */}
+            {/* 🔥 শুধুমাত্র Admin হলে 'Add Course' দেখাবে */}
             {user.role === 'admin' && (
               <li>
                 <Link to="/add-course" style={addCourseLinkStyle}>
@@ -53,11 +58,14 @@ const Navbar = () => {
             </button>
           </div>
         ) : (
-          <li>
-            <Link to="/login">
-              <button style={loginBtnStyle}>Login</button>
-            </Link>
-          </li>
+          <>
+            <li><Link to="/courses" style={linkStyle}>Courses</Link></li>
+            <li>
+              <Link to="/login">
+                <button style={loginBtnStyle}>Login</button>
+              </Link>
+            </li>
+          </>
         )}
       </ul>
     </nav>
@@ -91,6 +99,17 @@ const linkStyle = {
   color: '#4B5563',
   fontWeight: '500',
   fontSize: '15px'
+};
+
+// নতুন My Courses লিঙ্কের স্টাইল
+const myCoursesLinkStyle = {
+  textDecoration: 'none',
+  color: '#4F46E5',
+  fontWeight: '600',
+  fontSize: '15px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '5px'
 };
 
 const addCourseLinkStyle = {

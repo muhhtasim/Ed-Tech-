@@ -14,6 +14,8 @@ import Courses from './pages/Courses';
 
 import Payment from './pages/Payment';
 
+import MyCourses from './pages/MyCourses';
+
 import CourseDetails from './pages/CourseDetails';
 
 function App() {
@@ -49,7 +51,9 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             
             <Route path="/payment" element={<Payment />} />
-            
+           
+           <Route path="/my-courses" element={<MyCourses />} />
+           
             {/* ৬. অ্যাড কোর্স পেজ */}
             <Route path="/add-course" element={<AddCourse />} />
           </Routes>
