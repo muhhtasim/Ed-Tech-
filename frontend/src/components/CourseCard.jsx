@@ -1,77 +1,112 @@
 import React from 'react';
 import axios from 'axios';
-import { Trash2, Eye } from 'lucide-react';
+import { Trash2, ShoppingCart, Eye } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CourseCard = ({ course, onRefresh }) => {
-  
-  const handleDelete = async () => {
-  // console.log check korar jonno (F12 te dekhben id asche kina)
-  console.log("Deleting Course ID:", course.course_id || course.id);
+  // localStorage থেকে ইউজার ডাটা নেওয়া
+  const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
 
-  if (window.confirm(`Are you sure you want to delete this course?`)) {
-    try {
-      // ekhne course.course_id thik moto na pele course.id check korbe
-      const idToDelete = course.course_id || course.id; 
-      
-      const response = await axios.delete(`http://localhost:5000/delete-course/${idToDelete}`);
-      
-      alert("Deleted Successfully!");
-      onRefresh();
-    } catch (err) {
-      alert("Failed to delete: Server Error");
-      console.error(err);
+  const handleDelete = async (e) => {
+    e.stopPropagation(); 
+    if (window.confirm("Are you sure you want to delete this course?")) {
+      try {
+        await axios.delete(`http://localhost:5000/delete-course/${course.course_id}`);
+        alert("Course Deleted!");
+        onRefresh();
+      } catch (err) {
+        alert("Failed to delete the course.");
+      }
     }
-  }
-};
+  };
+
+  // ৩. Buy Now বাটনের জন্য আপডেট করা ফাংশন
+  const handleBuyNow = () => {
+    if (!user) {
+      alert("Please login first to buy this course!");
+      navigate('/login');
+      return;
+    }
+
+    // পেমেন্ট পেজে ডাটা পাঠানো হচ্ছে (সবগুলো প্রয়োজনীয় তথ্যসহ)
+    navigate('/payment', { 
+      state: { 
+        courseId: course.course_id, // 🔥 এটিই মিসিং ছিল!
+        courseTitle: course.title, 
+        price: course.price 
+      } 
+    });
+  };
 
   return (
     <div style={cardStyle}>
-      <div style={badgeStyle}>{course.category || 'Course'}</div>
-      <h3 style={titleStyle}>{course.title}</h3>
-      <p style={priceStyle}>{course.price} BDT</p>
+      {/* টাইটেল এবং ইমেজ (যদি থাকে) লিঙ্কে রূপান্তর */}
+      <Link to={`/course/${course.course_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <h3 style={titleStyle}>{course.title}</h3>
+      </Link>
       
-      <div style={actionContainer}>
-        <button style={viewBtnStyle}>
-          <Eye size={16} /> View
-        </button>
+      <p style={{ fontWeight: 'bold', color: '#4F46E5', marginBottom: '10px' }}>{course.price} BDT</p>
+      
+      <Link to={`/course/${course.course_id}`} style={viewLinkStyle}>
+        <Eye size={14} /> View Details
+      </Link>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px' }}>
         
-        <button 
-          onClick={handleDelete}
-          style={deleteBtnStyle}
-          title="Delete Course"
-        >
-          <Trash2 size={16} />
-        </button>
+        {/* কন্ডিশন ১: Admin ডিলিট বাটন দেখবে */}
+        {user && user.role === 'admin' && (
+          <button 
+            onClick={handleDelete}
+            style={{ background: '#EF4444', color: 'white', padding: '8px 12px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+          >
+            <Trash2 size={16} /> Delete
+          </button>
+        )}
+
+        {/* কন্ডিশন ২: Student বা গেস্ট Buy Now বাটন দেখবে */}
+        {(!user || user.role === 'student') && (
+          <button 
+            onClick={handleBuyNow} 
+            style={{ background: '#10B981', color: 'white', padding: '8px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+          >
+            <ShoppingCart size={18} /> Buy Now
+          </button>
+        )}
+
       </div>
     </div>
   );
 };
 
-// --- Styles (৫ বছরের অভিজ্ঞতায় ক্লিন লুকের জন্য) ---
+// --- Styles ---
 const cardStyle = {
-  border: '1px solid #e2e8f0',
+  border: '1px solid #e5e7eb',
   padding: '20px',
-  borderRadius: '15px',
+  borderRadius: '12px',
   width: '260px',
   background: '#fff',
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-  transition: 'transform 0.2s'
+  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+  transition: 'transform 0.2s',
+  cursor: 'pointer'
 };
 
-const titleStyle = { margin: '10px 0', fontSize: '18px', color: '#1e293b', height: '50px', overflow: 'hidden' };
-const priceStyle = { fontWeight: 'bold', color: '#4F46E5', fontSize: '20px' };
-const badgeStyle = { fontSize: '10px', background: '#f1f5f9', padding: '4px 8px', borderRadius: '5px', display: 'inline-block' };
-
-const actionContainer = { display: 'flex', justifyContent: 'space-between', marginTop: '15px', gap: '10px' };
-
-const viewBtnStyle = { 
-  flex: 1, background: '#4F46E5', color: 'white', padding: '8px', 
-  border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' 
+const titleStyle = {
+  margin: '0 0 10px 0',
+  fontSize: '18px',
+  color: '#1F2937',
+  height: '50px',
+  overflow: 'hidden'
 };
 
-const deleteBtnStyle = { 
-  background: '#fee2e2', color: '#ef4444', padding: '8px 12px', 
-  border: 'none', borderRadius: '8px', cursor: 'pointer' 
+const viewLinkStyle = {
+  fontSize: '13px',
+  color: '#4F46E5',
+  textDecoration: 'none',
+  fontWeight: '600',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4px'
 };
 
 export default CourseCard;

@@ -1,31 +1,28 @@
 const express = require('express');
-const mysql = require('./db'); // Amader age toiri kora db.js file
+const mysql = require('./db'); 
 const cors = require('cors');
 
 const app = express();
-app.use(express.json()); // JSON data receive korar jonno
-app.use(cors()); // Frontend access allow korar jonno
+app.use(express.json()); 
+app.use(cors()); 
 
-// Registration Route (Create User) 
+// --- ১. Registration Route ---
 app.post('/register', (req, res) => {
-    const { full_name, email, password, university } = req.body;
-
-    const sql = "INSERT INTO users (full_name, email, password, university) VALUES (?, ?, ?, ?)";
+    const { name, email, password, role } = req.body; 
+    const sql = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
     
-    mysql.query(sql, [full_name, email, password, university], (err, result) => {
+    mysql.query(sql, [name, email, password, role], (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).json({ message: "Registration failed! Maybe email already exists." });
+            return res.status(500).json({ message: "Registration failed!" });
         }
-        res.status(201).json({ message: "User registered successfully!", userId: result.insertId });
+        res.status(200).json({ message: "Account created successfully!" });
     });
 });
 
-// Login Route (Read User & Validate)
+// --- ২. Login Route ---
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
-    // Check if the user exists in the database [cite: 31]
     const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
     
     mysql.query(sql, [email, password], (err, results) => {
@@ -33,70 +30,69 @@ app.post('/login', (req, res) => {
             console.error(err);
             return res.status(500).json({ message: "Server error" });
         }
-
         if (results.length > 0) {
-            // User found and password matches
             const user = results[0];
             res.status(200).json({ 
-                message: "Login successful! Welcome back.", 
+                message: "Login successful!", 
                 user: {
                     id: user.user_id,
-                    name: user.full_name,
-                    role: user.role
+                    name: user.name || user.full_name, // আপনার ডাটাবেজের কলাম অনুযায়ী
+                    email: user.email,
+                    role: user.role,
+                    university: user.university
                 } 
             });
         } else {
-            // No user found with those credentials
             res.status(401).json({ message: "Invalid email or password!" });
         }
     });
 });
 
-// Create Course Route (Admin/Instructor can create posts)
-app.post('/courses', (req, res) => {
-    const { title, description, price, category, instructor_id } = req.body;
+// --- ৩. Enrollment Route (কোর্স কেনা) ---
+// পেমেন্ট সফল হওয়ার পর এই রুট কল হবে
+app.post('/enroll', (req, res) => {
+    const { user_id, course_id } = req.body;
+    const sql = "INSERT INTO enrollments (user_id, course_id) VALUES (?, ?)";
 
-    const sql = "INSERT INTO courses (title, description, price, category, instructor_id) VALUES (?, ?, ?, ?, ?)";
-    
-    mysql.query(sql, [title, description, price, category, instructor_id], (err, result) => {
+    mysql.query(sql, [user_id, course_id], (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).json({ message: "Failed to create course." });
+            return res.status(500).json({ message: "Enrollment failed!" });
         }
-        res.status(201).json({ message: "Course created successfully!", courseId: result.insertId });
+        res.status(200).json({ message: "Enrolled successfully!" });
     });
 });
 
-// Get All Courses with Search, Filter, and Sort functionality
+// --- ৪. Get User's Enrolled Courses (ড্যাশবোর্ডের জন্য) ---
+app.get('/my-courses/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const sql = `
+        SELECT courses.* FROM courses 
+        JOIN enrollments ON courses.course_id = enrollments.course_id 
+        WHERE enrollments.user_id = ?`;
+
+    mysql.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error fetching your courses" });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// --- ৫. Get All Courses (With Filter Support) ---
 app.get('/courses', (req, res) => {
-    let { search, minPrice, maxPrice, orderBy, orderDir } = req.query;
+    let { search, userId } = req.query; // userId পাঠানো হলে কেনা কোর্স বাদ দিবে
     
-    // Base SQL query
-    let sql = "SELECT * FROM courses WHERE 1=1";
+    let sql = "SELECT * FROM courses";
     let queryParams = [];
 
-    // 1. Search by Title
-    if (search) {
-        sql += " AND title LIKE ?";
-        queryParams.push(`%${search}%`);
+    // যদি ইউজার লগইন থাকে, তবে তার কেনা কোর্সগুলো বাদ দেওয়ার লজিক
+    if (userId) {
+        sql = `SELECT * FROM courses WHERE course_id NOT IN 
+               (SELECT course_id FROM enrollments WHERE user_id = ?)`;
+        queryParams.push(userId);
     }
-
-    // 2. Filter by Price Range
-    if (minPrice) {
-        sql += " AND price >= ?";
-        queryParams.push(minPrice);
-    }
-    if (maxPrice) {
-        sql += " AND price <= ?";
-        queryParams.push(maxPrice);
-    }
-
-    // 3. Order by (Default name sorting)
-    let validColumns = ['title', 'price', 'created_at'];
-    let sortColumn = validColumns.includes(orderBy) ? orderBy : 'title';
-    let sortDir = (orderDir === 'DESC') ? 'DESC' : 'ASC';
-
-    sql += ` ORDER BY ${sortColumn} ${sortDir}`;
 
     mysql.query(sql, queryParams, (err, results) => {
         if (err) {
@@ -107,48 +103,42 @@ app.get('/courses', (req, res) => {
     });
 });
 
-// Update User Information
-app.put('/update-user/:id', (req, res) => {
-    const { full_name, university } = req.body;
-    const userId = req.params.id;
-
-    const sql = "UPDATE users SET full_name = ?, university = ? WHERE user_id = ?";
-    
-    mysql.query(sql, [full_name, university, userId], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Update failed!" });
-        }
-        res.status(200).json({ message: "Profile updated successfully!" });
+// --- ৬. Single Course & Course Management ---
+app.get('/course/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM courses WHERE course_id = ?";
+    mysql.query(sql, [id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json(data[0]);
     });
 });
 
-// Delete a course
-// backend/server.js ফাইলে গিয়ে এই অংশটুকু খুঁজুন বা যোগ করুন
+app.post('/add-course', (req, res) => {
+    const { title, price, category } = req.body;
+    const sql = "INSERT INTO courses (title, price, category) VALUES (?, ?, ?)";
+    mysql.query(sql, [title, price, category], (err, result) => {
+        if (err) return res.status(500).json({ message: "Error adding course" });
+        res.status(200).json({ message: "Course added successfully!" });
+    });
+});
+
 app.delete('/delete-course/:id', (req, res) => {
     const courseId = req.params.id;
     const sql = "DELETE FROM courses WHERE course_id = ?";
-
     mysql.query(sql, [courseId], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Database error" });
-        }
+        if (err) return res.status(500).json({ message: "Database error" });
         res.status(200).json({ message: "Deleted successfully" });
     });
 });
 
-// Add a new course
-app.post('/add-course', (req, res) => {
-    const { title, price, category } = req.body;
-    const sql = "INSERT INTO courses (title, price, category) VALUES (?, ?, ?)";
-
-    mysql.query(sql, [title, price, category], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Error adding course" });
-        }
-        res.status(200).json({ message: "Course added successfully!" });
+// --- ৭. Update User ---
+app.put('/update-user/:id', (req, res) => {
+    const { full_name, university } = req.body;
+    const userId = req.params.id;
+    const sql = "UPDATE users SET name = ?, university = ? WHERE user_id = ?";
+    mysql.query(sql, [full_name, university, userId], (err, result) => {
+        if (err) return res.status(500).json({ message: "Update failed!" });
+        res.status(200).json({ message: "Profile updated successfully!" });
     });
 });
 

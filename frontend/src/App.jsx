@@ -10,6 +10,11 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Guideline from './pages/Guideline';
 import AddCourse from './pages/AddCourse';
+import Courses from './pages/Courses';
+
+import Payment from './pages/Payment';
+
+import CourseDetails from './pages/CourseDetails';
 
 function App() {
   return (
@@ -27,6 +32,8 @@ function App() {
           <Routes>
             {/* ১. হোম পেজ */}
             <Route path="/" element={<Home />} />
+             
+             <Route path="/course/:id" element={<CourseDetails />} /> 
 
             {/* ২. রেজিস্ট্রেশন পেজ */}
             <Route path="/register" element={<Register />} />
@@ -39,7 +46,10 @@ function App() {
 
             {/* ৫. গাইডলাইন পেজ */}
             <Route path="/guideline" element={<Guideline />} />
-
+            <Route path="/courses" element={<Courses />} />
+            
+            <Route path="/payment" element={<Payment />} />
+            
             {/* ৬. অ্যাড কোর্স পেজ */}
             <Route path="/add-course" element={<AddCourse />} />
           </Routes>

@@ -11,7 +11,8 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     alert("Logged out successfully!");
-    navigate('/login');
+    // লগআউট করার পর পেজ রিলোড দিলে নেভবার অটোমেটিক আপডেট হয়ে যাবে
+    window.location.href = '/login'; 
   };
 
   return (
@@ -28,20 +29,25 @@ const Navbar = () => {
         <li><Link to="/guideline" style={linkStyle}>Guideline</Link></li>
         <li><Link to="/courses" style={linkStyle}>Courses</Link></li>
 
-        {/* ৩. ইউজার লগইন থাকলে 'Add Course' এবং প্রোফাইল দেখাবে */}
+        {/* ৩. ইউজার লগইন থাকলে অপশনগুলো দেখাবে */}
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {/* Add Course Link - লগইন থাকলেই শুধু দেখা যাবে */}
-            <li>
-              <Link to="/add-course" style={addCourseLinkStyle}>
-                <PlusCircle size={18} /> Add Course
-              </Link>
-            </li>
+            
+            {/* 🔥 নতুন লজিক: শুধুমাত্র Admin হলে 'Add Course' দেখাবে */}
+            {user.role === 'admin' && (
+              <li>
+                <Link to="/add-course" style={addCourseLinkStyle}>
+                  <PlusCircle size={18} /> Add Course
+                </Link>
+              </li>
+            )}
 
+            {/* ইউজার ড্যাশবোর্ড লিঙ্ক */}
             <Link to="/dashboard" style={dashboardLinkStyle}>
               <User size={18} /> Hi, {user.name}
             </Link>
             
+            {/* লগআউট বাটন */}
             <button onClick={handleLogout} style={logoutBtnStyle} title="Logout">
               <LogOut size={18} />
             </button>
@@ -73,7 +79,7 @@ const navStyle = {
 
 const ulStyle = {
   display: 'flex',
-  gap: '25px',
+  gap: '20px',
   listStyle: 'none',
   alignItems: 'center',
   margin: 0,
@@ -87,17 +93,16 @@ const linkStyle = {
   fontSize: '15px'
 };
 
-// Add Course বাটন স্টাইল
 const addCourseLinkStyle = {
   textDecoration: 'none',
   color: '#4F46E5',
   fontWeight: '600',
-  fontSize: '15px',
+  fontSize: '14px',
   display: 'flex',
   alignItems: 'center',
   gap: '5px',
   border: '1px solid #4F46E5',
-  padding: '6px 15px',
+  padding: '6px 12px',
   borderRadius: '20px',
   transition: '0.3s'
 };
@@ -117,6 +122,7 @@ const dashboardLinkStyle = {
   textDecoration: 'none',
   color: '#4F46E5',
   fontWeight: 'bold',
+  fontSize: '14px',
   display: 'flex',
   alignItems: 'center',
   gap: '5px',
@@ -131,7 +137,8 @@ const logoutBtnStyle = {
   color: '#EF4444',
   cursor: 'pointer',
   display: 'flex',
-  alignItems: 'center'
+  alignItems: 'center',
+  padding: '5px'
 };
 
 export default Navbar;
