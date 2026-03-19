@@ -99,6 +99,7 @@ const titleStyle = {
   overflow: 'hidden'
 };
 
+
 const viewLinkStyle = {
   fontSize: '13px',
   color: '#4F46E5',
