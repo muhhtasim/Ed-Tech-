@@ -1,147 +1,100 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { UserPlus } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
-  // ১. স্টেট-এ 'role' এবং আপনার আগের 'university' কলামগুলো রাখা হয়েছে
-  const [formData, setFormData] = useState({ 
-    full_name: '', 
-    email: '', 
-    password: '', 
-    university: '',
-    role: 'student' // ডিফল্ট রোল স্টুডেন্ট রাখা হয়েছে
-  });
-  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [university, setUniversity] = useState(''); // নতুন স্টেট
+  const [role, setRole] = useState('student'); 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    
     try {
-      // ব্যাকএন্ডে পুরো formData পাঠানো হচ্ছে (role সহ)
-      await axios.post('http://localhost:5000/register', formData);
-      alert("Registration Successful! Now Login.");
+      // আমরা এখন university সহ ডাটা পাঠাচ্ছি
+      const res = await axios.post('http://localhost:5000/register', { 
+        name, 
+        email, 
+        password, 
+        role,
+        university // ব্যাকএন্ডে এটি পাঠানো হচ্ছে
+      });
+
+      alert("Registration Successful! Please login.");
       navigate('/login');
     } catch (err) {
-      alert("Registration failed. Email might already exist or Server Error.");
       console.error(err);
+      alert("Registration Failed! " + (err.response?.data?.error || "Check your details."));
     }
   };
 
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <UserPlus color="#4F46E5" size={24} />
-          <h2 style={{ margin: 0 }}>Create Account</h2>
-        </div>
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          
-          <label style={labelStyle}>Full Name</label>
+        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Register</h2>
+        
+        <form onSubmit={handleRegister} style={formStyle}>
           <input 
             type="text" 
-            placeholder="Enter your name" 
-            onChange={(e) => setFormData({...formData, full_name: e.target.value})} 
+            placeholder="Full Name" 
+            style={inputStyle}
+            onChange={(e) => setName(e.target.value)} 
             required 
-            style={inputStyle} 
           />
-
-          <label style={labelStyle}>Email Address</label>
           <input 
             type="email" 
-            placeholder="example@mail.com" 
-            onChange={(e) => setFormData({...formData, email: e.target.value})} 
+            placeholder="Email Address" 
+            style={inputStyle}
+            onChange={(e) => setEmail(e.target.value)} 
             required 
-            style={inputStyle} 
           />
-
-          <label style={labelStyle}>Password</label>
-          <input 
-            type="password" 
-            placeholder="••••••••" 
-            onChange={(e) => setFormData({...formData, password: e.target.value})} 
-            required 
-            style={inputStyle} 
-          />
-
-          <label style={labelStyle}>University / Institute</label>
+          {/* নতুন ইউনিভার্সিটি ইনপুট ফিল্ড */}
           <input 
             type="text" 
-            placeholder="Your University Name" 
-            onChange={(e) => setFormData({...formData, university: e.target.value})} 
-            style={inputStyle} 
+            placeholder="University Name" 
+            style={inputStyle}
+            onChange={(e) => setUniversity(e.target.value)} 
+            required 
           />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            style={inputStyle}
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+          />
+          
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ fontSize: '14px', color: '#666' }}>Register as:</label>
+            <select 
+              value={role} 
+              onChange={(e) => setRole(e.target.value)} 
+              style={inputStyle}
+            >
+              <option value="student">Student</option>
+              <option value="admin">Teacher/Admin</option>
+            </select>
+          </div>
 
-          {/* ২. নতুন রোল সিলেকশন ড্রপডাউন */}
-          <label style={labelStyle}>Register as a:</label>
-          <select 
-            style={inputStyle} 
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-            required
-          >
-            <option value="student">Student (I want to learn)</option>
-            <option value="admin">Teacher / Admin (I want to teach)</option>
-          </select>
-
-          <button type="submit" style={btnStyle}>Create Account</button>
+          <button type="submit" style={btnStyle}>Register</button>
         </form>
-
-        <p style={{ textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666' }}>
-          Already have an account? <span onClick={() => navigate('/login')} style={{ color: '#4F46E5', cursor: 'pointer', fontWeight: '600' }}>Login</span>
+        
+        <p style={{ textAlign: 'center', marginTop: '15px' }}>
+          Already have an account? <Link to="/login" style={{ color: '#4F46E5', textDecoration: 'none', fontWeight: 'bold' }}>Login</Link>
         </p>
       </div>
     </div>
   );
 };
 
-// --- Styles ---
-const containerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  minHeight: '85vh',
-  background: '#f9fafb',
-  padding: '20px'
-};
-
-const cardStyle = {
-  width: '100%',
-  maxWidth: '450px',
-  padding: '40px',
-  background: '#fff',
-  borderRadius: '15px',
-  boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-  border: '1px solid #e5e7eb'
-};
-
-const labelStyle = {
-  fontSize: '14px',
-  fontWeight: '500',
-  color: '#374151',
-  marginBottom: '-10px' // ইনপুটের সাথে গ্যাপ কমানোর জন্য
-};
-
-const inputStyle = { 
-  padding: '12px', 
-  borderRadius: '8px', 
-  border: '1px solid #d1d5db',
-  fontSize: '15px',
-  outline: 'none'
-};
-
-const btnStyle = { 
-  padding: '12px', 
-  background: '#4F46E5', 
-  color: 'white', 
-  border: 'none', 
-  borderRadius: '8px', 
-  cursor: 'pointer',
-  fontWeight: '600',
-  fontSize: '16px',
-  marginTop: '10px',
-  transition: '0.3s'
-};
+// --- Styles (আগের মতোই) ---
+const containerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', background: '#F3F4F6', padding: '20px' };
+const cardStyle = { background: '#fff', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' };
+const formStyle = { display: 'flex', flexDirection: 'column', gap: '15px' };
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid #D1D5DB', fontSize: '16px', outline: 'none', width: '100%', boxSizing: 'border-box' };
+const btnStyle = { padding: '12px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' };
 
 export default Register;

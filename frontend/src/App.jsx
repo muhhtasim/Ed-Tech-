@@ -3,63 +3,55 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Components & Pages Import
 import Navbar from './components/Navbar';
-import Footer from './components/Footer'; // ১. ফুটার ইম্পোর্ট করা হলো
+import Footer from './components/Footer'; 
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Guideline from './pages/Guideline';
 import AddCourse from './pages/AddCourse';
+import ManageCourses from './pages/ManageCourses'; // নতুন ইম্পোর্ট
 import Courses from './pages/Courses';
-
 import Payment from './pages/Payment';
-
 import MyCourses from './pages/MyCourses';
-
 import CourseDetails from './pages/CourseDetails';
 
 function App() {
   return (
     <Router>
-      {/* নিচের স্টাইলটি দেওয়া হয়েছে যাতে ফুটার সবসময় পেজের নিচে থাকে। 
-          পেজে কন্টেন্ট কম থাকলেও ফুটার নিচে "Sticky" হয়ে থাকবে।
+      {/* Flexbox ব্যবহার করা হয়েছে যাতে কন্টেন্ট কম থাকলেও 
+        ফুটার সবসময় স্ক্রিনের নিচে (Sticky Footer) থাকে।
       */}
       <div className="app-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         
-        {/* Navbar সব পেজেই দেখা যাবে */}
+        {/* Navbar: সব পেজেই দেখা যাবে */}
         <Navbar />
         
-        {/* মেইন কন্টেন্ট এলাকা (flex: 1 দেওয়া হয়েছে ফুটারকে নিচে পুশ করার জন্য) */}
+        {/* Main Content: flex: 1 দেওয়া হয়েছে ফুটারকে নিচে পুশ করার জন্য */}
         <div style={{ flex: 1 }}>
           <Routes>
-            {/* ১. হোম পেজ */}
+            {/* ১. সাধারণ পেজসমূহ */}
             <Route path="/" element={<Home />} />
-             
-             <Route path="/course/:id" element={<CourseDetails />} /> 
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/course/:id" element={<CourseDetails />} /> 
+            <Route path="/guideline" element={<Guideline />} />
 
-            {/* ২. রেজিস্ট্রেশন পেজ */}
+            {/* ২. অথেন্টিকেশন (Login/Register) */}
             <Route path="/register" element={<Register />} />
-
-            {/* ৩. লগইন পেজ */}
             <Route path="/login" element={<Login />} />
 
-            {/* ৪. ড্যাশবোর্ড পেজ */}
+            {/* ৩. ইউজার প্রোফাইল ও লার্নিং */}
             <Route path="/dashboard" element={<Dashboard />} />
-
-            {/* ৫. গাইডলাইন পেজ */}
-            <Route path="/guideline" element={<Guideline />} />
-            <Route path="/courses" element={<Courses />} />
-            
+            <Route path="/my-courses" element={<MyCourses />} />
             <Route path="/payment" element={<Payment />} />
-           
-           <Route path="/my-courses" element={<MyCourses />} />
-           
-            {/* ৬. অ্যাড কোর্স পেজ */}
+
+            {/* ৪. এডমিন প্যানেল ফিচারসমূহ */}
             <Route path="/add-course" element={<AddCourse />} />
+            <Route path="/manage-courses" element={<ManageCourses />} /> {/* নতুন রাউট */}
           </Routes>
         </div>
 
-        {/* Footer সব পেজের নিচেই দেখা যাবে */}
+        {/* Footer: সব পেজের শেষে দেখা যাবে */}
         <Footer />
         
       </div>

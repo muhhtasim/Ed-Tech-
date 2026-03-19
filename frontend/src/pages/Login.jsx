@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { LockKeyhole } from 'lucide-react';
+import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,113 +12,99 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/login', { email, password });
-      
-      // ১. ডাটাবেজ থেকে আসা ইউজার অবজেক্টটি (নাম, ইমেইল, রোল সহ) সেভ করা
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      
-      alert(`Login Successful! Welcome ${res.data.user.name}`);
-
-      // ২. রোল অনুযায়ী রিডাইরেক্ট (৫ বছরের অভিজ্ঞতায় এটিই সেরা প্র্যাকটিস)
-      if (res.data.user.role === 'admin') {
-        navigate('/'); // এডমিন সরাসরি হোম পেজে যাবে কোর্স অ্যাড/ডিলিট করার জন্য
-      } else {
-        navigate('/dashboard'); // স্টুডেন্ট তার ড্যাশবোর্ডে যাবে
-      }
-
-      // নেভবার আপডেট করার জন্য পেজ রিফ্রেশ (অথবা স্টেট ম্যানেজমেন্ট ব্যবহার করা যায়)
-      window.location.reload(); 
-
+      alert("Login Success!");
+      window.location.href = '/'; 
     } catch (err) {
-      alert("Invalid Credentials! Please check your email/password.");
-      console.error(err);
+      alert("Invalid Credentials!");
     }
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-          <div style={iconCircle}>
-            <LockKeyhole color="#4F46E5" size={28} />
-          </div>
+    <div style={authWrapper}>
+      <div style={authCard}>
+        <div style={iconCircle}>
+          <LogIn size={32} color="#fff" />
         </div>
         
-        <h2 style={{ color: '#1F2937', marginBottom: '10px' }}>Welcome Back</h2>
-        <p style={{ color: '#6B7280', fontSize: '14px', marginBottom: '25px' }}>Please enter your details to login</p>
-        
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <input 
-            type="email" 
-            placeholder="Email Address" 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            style={inputStyle} 
-          />
-          <input 
-            type="password" 
-            placeholder="Password" 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-            style={inputStyle} 
-          />
-          <button type="submit" style={btnStyle}>Sign In</button>
+        <h2 style={authTitle}>Welcome <span style={gradientText}>Back!</span></h2>
+        <p style={authSubTitle}>Log in to continue your learning journey.</p>
+
+        <form onSubmit={handleLogin} style={formStyle}>
+          <div style={inputGroup}>
+            <Mail size={18} color="#9CA3AF" style={inputIcon} />
+            <input 
+              type="email" 
+              placeholder="Email Address" 
+              style={inputStyle} // এখানে টেক্সট কালার ঠিক করা হয়েছে
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+            />
+          </div>
+
+          <div style={inputGroup}>
+            <Lock size={18} color="#9CA3AF" style={inputIcon} />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              style={inputStyle} // এখানে টেক্সt কালার ঠিক করা হয়েছে
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+            />
+          </div>
+
+          <button type="submit" style={authBtn}>
+            Login Now <ArrowRight size={18} />
+          </button>
         </form>
 
-        <p style={{ marginTop: '20px', fontSize: '14px', color: '#6B7280' }}>
-          Don't have an account? <Link to="/register" style={{ color: '#4F46E5', fontWeight: 'bold', textDecoration: 'none' }}>Register here</Link>
+        <p style={toggleText}>
+          Don't have an account? <Link to="/register" style={linkStyle}>Register here</Link>
         </p>
       </div>
     </div>
   );
 };
 
-// --- Styles ---
-const containerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '85vh',
-  background: '#F9FAFB' 
+// --- Styles (পরিবর্তন শুধুমাত্র inputStyle এ) ---
+const authWrapper = {
+  display: 'flex', justifyContent: 'center', alignItems: 'center',
+  minHeight: '90vh', background: 'radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, #F3F4F6 100%)'
 };
 
-const cardStyle = {
-  background: '#fff',
-  padding: '40px',
-  borderRadius: '16px',
-  boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-  width: '100%',
-  maxWidth: '400px',
-  textAlign: 'center',
-  border: '1px solid #E5E7EB'
+const authCard = {
+  background: '#fff', padding: '50px 40px', borderRadius: '24px',
+  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', width: '100%', maxWidth: '420px', textAlign: 'center'
 };
 
 const iconCircle = {
-  background: '#EEF2FF',
-  padding: '15px',
-  borderRadius: '50%',
-  display: 'inline-block'
+  width: '70px', height: '70px', background: 'linear-gradient(135deg, #4F46E5 0%, #10B981 100%)',
+  borderRadius: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 20px auto',
+  boxShadow: '0 10px 15px rgba(79, 70, 229, 0.3)'
 };
 
-const inputStyle = {
-  padding: '12px 15px',
-  borderRadius: '10px',
-  border: '1px solid #D1D5DB',
-  outline: 'none',
-  fontSize: '15px',
-  transition: '0.2s'
+const authTitle = { fontSize: '32px', fontWeight: '800', color: '#111827', margin: '0 0 10px 0' };
+const gradientText = { background: 'linear-gradient(90deg, #4F46E5, #10B981)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' };
+const authSubTitle = { color: '#6B7280', marginBottom: '30px', fontSize: '15px' };
+const formStyle = { display: 'flex', flexDirection: 'column', gap: '20px' };
+const inputGroup = { position: 'relative', display: 'flex', alignItems: 'center' };
+const inputIcon = { position: 'absolute', left: '15px' };
+
+// এখানে কালার পরিবর্তন করা হয়েছে
+const inputStyle = { 
+  width: '100%', 
+  padding: '15px 15px 15px 45px', 
+  borderRadius: '12px', 
+  border: '1px solid #E5E7EB', 
+  outline: 'none', 
+  fontSize: '15px', 
+  background: '#FFFFFF', // ব্যাকগ্রাউন্ড পিওর হোয়াইট
+  color: '#1F2937',      // ইনপুটে টাইপ করার সময় লেখা গাঢ় ধূসর/কালো দেখাবে
+  transition: '0.3s' 
 };
 
-const btnStyle = {
-  padding: '12px',
-  background: '#4F46E5',
-  color: 'white',
-  border: 'none',
-  borderRadius: '10px',
-  cursor: 'pointer',
-  fontSize: '16px',
-  fontWeight: 'bold',
-  marginTop: '10px',
-  transition: '0.3s'
-};
+const authBtn = { padding: '15px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)', transition: '0.3s' };
+const toggleText = { marginTop: '25px', color: '#6B7280', fontSize: '14px' };
+const linkStyle = { color: '#4F46E5', fontWeight: 'bold', textDecoration: 'none' };
 
 export default Login;
