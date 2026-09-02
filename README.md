@@ -241,3 +241,24 @@ This project demonstrates:
 - Database design (MySQL)  
 - Backend API development  
 - Frontend UI implementation  
+
+## 🚀 Run Locally
+
+1. Create a `.env` in `backend/` (optional) with `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`.
+2. From the repo root, install dependencies and set up the database:
+
+```bash
+npm --prefix backend install
+npm --prefix frontend install
+npm --prefix backend run setup-db
+```
+
+3. Start services:
+
+```bash
+npm --prefix backend start      # backend on :5000
+npm --prefix frontend run dev   # frontend (Vite) on :5173/5174
+```
+
+Open the frontend URL printed by Vite (e.g. http://localhost:5174).
+

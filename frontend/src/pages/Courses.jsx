@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import CourseCard from '../components/CourseCard';
 import { BookOpen, AlertCircle } from 'lucide-react';
 
@@ -15,7 +15,7 @@ const Courses = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/courses');
+      const res = await api.get('/courses');
       setCourses(res.data);
       setError(null);
     } catch (err) {
@@ -30,10 +30,10 @@ const Courses = () => {
     <div style={containerStyle}>
       <div style={headerStyle}>
         <div style={iconBox}>
-          <BookOpen size={30} color="#fff" />
+          <BookOpen size={30} color="var(--bg)" />
         </div>
         <h1 style={{ margin: '10px 0' }}>All Available Courses</h1>
-        <p style={{ color: '#6B7280' }}>Browse our complete catalog of professional programs.</p>
+        <p style={{ color: 'var(--muted)' }}>Browse our complete catalog of professional programs.</p>
       </div>
 
       {/* লোডিং অবস্থা */}
@@ -47,7 +47,7 @@ const Courses = () => {
       {/* এরর মেসেজ (সার্ভার বন্ধ থাকলে এটি দেখাবে) */}
       {error && (
         <div style={errorCard}>
-          <AlertCircle size={40} color="#EF4444" />
+          <AlertCircle size={40} color="var(--danger)" />
           <p>{error}</p>
           <button onClick={fetchCourses} style={retryBtn}>Retry</button>
         </div>
@@ -65,7 +65,7 @@ const Courses = () => {
               />
             ))
           ) : (
-            <p style={{ textAlign: 'center', width: '100%', color: '#9CA3AF' }}>
+            <p style={{ textAlign: 'center', width: '100%', color: 'var(--muted-2)' }}>
               No courses found in the database.
             </p>
           )}
@@ -76,25 +76,25 @@ const Courses = () => {
 };
 
 // --- Styles ---
-const containerStyle = { padding: '50px 8%', background: '#F9FAFB', minHeight: '100vh' };
+const containerStyle = { padding: '50px 8%', background: 'var(--surface)', minHeight: '100vh' };
 const headerStyle = { textAlign: 'center', marginBottom: '50px' };
-const iconBox = { background: '#4F46E5', width: '60px', height: '60px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)' };
+const iconBox = { background: 'var(--primary)', width: '60px', height: '60px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)' };
 
 const gridStyle = { 
   display: 'grid', 
-  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-  gap: '30px', 
+  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
+  gap: '20px', 
   justifyItems: 'center' 
 };
 
-const errorCard = { textAlign: 'center', padding: '40px', background: '#FEF2F2', borderRadius: '12px', border: '1px solid #FEE2E2', maxWidth: '400px', margin: '0 auto' };
-const retryBtn = { marginTop: '15px', padding: '8px 20px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' };
+const errorCard = { textAlign: 'center', padding: '40px', background: '#FEF2F2', borderRadius: '12px', border: '1px solid var(--danger-50)', maxWidth: '400px', margin: '0 auto' };
+const retryBtn = { marginTop: '15px', padding: '8px 20px', background: 'var(--primary)', color: 'var(--bg)', border: 'none', borderRadius: '5px', cursor: 'pointer' };
 
 const spinnerStyle = { 
   width: '40px', 
   height: '40px', 
-  border: '4px solid #f3f3f3', 
-  borderTop: '4px solid #4F46E5', 
+  border: '4px solid var(--surface)', 
+  borderTop: '4px solid var(--primary)',
   borderRadius: '50%', 
   margin: '0 auto 10px',
   animation: 'spin 1s linear infinite' 

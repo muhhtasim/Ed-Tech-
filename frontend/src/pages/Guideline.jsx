@@ -57,8 +57,8 @@ const Guideline = () => {
   return (
     <div style={containerStyle}>
       <div style={headerSection}>
-        <h1 style={{ color: '#111827', fontSize: '32px', marginBottom: '10px' }}>Learning Guidelines</h1>
-        <p style={{ color: '#6B7280', maxWidth: '600px', margin: '0 auto' }}>
+        <h1 style={{ color: 'var(--text-dark)', fontSize: '32px', marginBottom: '10px' }}>Learning Guidelines</h1>
+        <p style={{ color: 'var(--muted)', maxWidth: '600px', margin: '0 auto' }}>
           We have curated the best resources from the internet to help you become a professional developer.
         </p>
       </div>
@@ -88,12 +88,12 @@ const Guideline = () => {
 };
 
 // --- Styles (Modern & Clean) ---
-const containerStyle = { padding: '60px 10%', background: '#F9FAFB', minHeight: '100vh' };
+const containerStyle = { padding: '60px 10%', background: 'var(--surface)', minHeight: '100vh' };
 const headerSection = { textAlign: 'center', marginBottom: '50px' };
 const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px' };
 
 const cardStyle = {
-  background: '#fff',
+  background: 'var(--bg)',
   padding: '30px',
   borderRadius: '16px',
   boxShadow: '0 4px 6px rgba(0,0,0,0.02)',
@@ -112,13 +112,13 @@ const iconBoxStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#4F46E5',
+  color: 'var(--primary)',
   marginBottom: '20px'
 };
 
-const titleStyle = { margin: '0 0 10px 0', fontSize: '20px', color: '#1F2937' };
-const badgeStyle = { fontSize: '11px', background: '#F3F4F6', color: '#6B7280', padding: '3px 10px', borderRadius: '5px', fontWeight: 'bold', width: 'fit-content', marginBottom: '15px', textTransform: 'uppercase' };
-const descStyle = { fontSize: '14px', color: '#6B7280', lineHeight: '1.5', marginBottom: '20px', flexGrow: 1 };
+const titleStyle = { margin: '0 0 10px 0', fontSize: '20px', color: 'var(--text-dark)' };
+const badgeStyle = { fontSize: '11px', background: 'var(--surface)', color: 'var(--muted)', padding: '3px 10px', borderRadius: '5px', fontWeight: 'bold', width: 'fit-content', marginBottom: '15px', textTransform: 'uppercase' };
+const descStyle = { fontSize: '14px', color: 'var(--muted)', lineHeight: '1.5', marginBottom: '20px', flexGrow: 1 };
 
 const linkButtonStyle = {
   display: 'flex',
@@ -126,8 +126,8 @@ const linkButtonStyle = {
   justifyContent: 'center',
   gap: '8px',
   textDecoration: 'none',
-  background: '#4F46E5',
-  color: '#fff',
+  background: 'var(--primary)',
+  color: 'var(--bg)',
   padding: '10px',
   borderRadius: '8px',
   fontWeight: '600',

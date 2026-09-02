@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import api from '../utils/api';
 import { BookOpen, PlayCircle, Loader2 } from 'lucide-react';
 
 const MyCourses = () => {
@@ -7,10 +8,12 @@ const MyCourses = () => {
   const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem('user'));
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchMyCourses = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/my-courses/${user.id || user.user_id}`);
+        const res = await api.get(`/my-courses/${user.id || user.user_id}`);
         setEnrolledCourses(res.data);
       } catch (err) {
         console.error("Error fetching courses:", err);
@@ -19,24 +22,24 @@ const MyCourses = () => {
       }
     };
     if (user) fetchMyCourses();
-  }, []);
+  }, [user]);
 
   if (loading) return (
-    <div style={{ textAlign: 'center', marginTop: '100px', color: '#4F46E5' }}>
+    <div style={{ textAlign: 'center', marginTop: '100px', color: 'var(--primary)' }}>
       <Loader2 className="animate-spin" size={40} />
       <p>Loading your learning journey...</p>
     </div>
   );
 
   return (
-    <div style={{ padding: '60px 8%', minHeight: '80vh', background: '#F9FAFB' }}>
+    <div style={{ padding: '60px 8%', minHeight: '80vh', background: 'var(--surface)' }}>
       {/* হেডার সেকশন */}
       <div style={{ textAlign: 'center', marginBottom: '50px' }}>
         <h1 style={sectionTitleGradient}>
           <BookOpen size={36} style={{ verticalAlign: 'middle', marginRight: '10px' }} />
           My Enrolled Courses
         </h1>
-        <p style={{ color: '#6B7280', fontSize: '16px', marginTop: '10px' }}>
+        <p style={{ color: 'var(--muted)', fontSize: '16px', marginTop: '10px' }}>
           Welcome back! Continue where you left off.
         </p>
       </div>
@@ -50,8 +53,8 @@ const MyCourses = () => {
               <div style={progressBarContainer}>
                 <div style={progressBar}></div>
               </div>
-              <p style={{ color: '#6B7280', fontSize: '13px', marginBottom: '20px' }}>
-                Progress: <span style={{ color: '#4F46E5', fontWeight: 'bold' }}>0% Completed</span>
+              <p style={{ color: 'var(--muted)', fontSize: '13px', marginBottom: '20px' }}>
+                Progress: <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>0% Completed</span>
               </p>
               <button style={startBtnStyle}>
                 <PlayCircle size={18} /> Start Learning
@@ -60,10 +63,10 @@ const MyCourses = () => {
           ))}
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '100px 0' }}>
-          <h3 style={{ color: '#9CA3AF' }}>You haven't enrolled in any courses yet.</h3>
+          <div style={{ textAlign: 'center', padding: '100px 0' }}>
+          <h3 style={{ color: 'var(--muted-2)' }}>You haven't enrolled in any courses yet.</h3>
           <button 
-            onClick={() => window.location.href = '/'} 
+            onClick={() => navigate('/')} 
             style={browseBtnStyle}
           >
             Browse Courses
@@ -78,7 +81,7 @@ const MyCourses = () => {
 const sectionTitleGradient = {
   fontSize: '40px',
   fontWeight: '900',
-  background: 'linear-gradient(90deg, #4F46E5 0%, #10B981 100%)',
+  background: 'linear-gradient(90deg, var(--primary) 0%, var(--success) 100%)',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   display: 'inline-block'
@@ -87,7 +90,7 @@ const sectionTitleGradient = {
 const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px' };
 
 const enrolledCardStyle = { 
-  background: '#fff', 
+  background: 'var(--bg)', 
   padding: '30px', 
   borderRadius: '20px', 
   border: '1px solid #E5E7EB', 
@@ -97,8 +100,8 @@ const enrolledCardStyle = {
 };
 
 const badgeStyle = { 
-  background: '#EEF2FF', 
-  color: '#4F46E5', 
+  background: 'var(--primary-50)', 
+  color: 'var(--primary)', 
   padding: '5px 12px', 
   borderRadius: '20px', 
   fontSize: '12px', 
@@ -107,14 +110,14 @@ const badgeStyle = {
   display: 'inline-block'
 };
 
-const courseTitleStyle = { fontSize: '22px', fontWeight: '800', color: '#1F2937', marginBottom: '15px', height: '60px', overflow: 'hidden' };
+const courseTitleStyle = { fontSize: '22px', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '15px', height: '60px', overflow: 'hidden' };
 
-const progressBarContainer = { width: '100%', height: '8px', background: '#F3F4F6', borderRadius: '10px', marginBottom: '10px' };
-const progressBar = { width: '10%', height: '100%', background: 'linear-gradient(90deg, #4F46E5, #10B981)', borderRadius: '10px' };
+const progressBarContainer = { width: '100%', height: '8px', background: 'var(--surface)', borderRadius: '10px', marginBottom: '10px' };
+const progressBar = { width: '10%', height: '100%', background: 'linear-gradient(90deg, var(--primary), var(--success))', borderRadius: '10px' };
 
 const startBtnStyle = { 
   width: '100%', padding: '14px', 
-  background: '#4F46E5', color: '#fff', 
+  background: 'var(--primary)', color: 'var(--bg)', 
   border: 'none', borderRadius: '12px', 
   fontWeight: 'bold', cursor: 'pointer', 
   display: 'flex', justifyContent: 'center', 
@@ -122,6 +125,6 @@ const startBtnStyle = {
   boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
 };
 
-const browseBtnStyle = { marginTop: '20px', padding: '12px 25px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' };
+const browseBtnStyle = { marginTop: '20px', padding: '12px 25px', background: 'var(--primary)', color: 'var(--bg)', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' };
 
 export default MyCourses;

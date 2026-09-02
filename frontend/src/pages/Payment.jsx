@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useToast } from '../contexts/ToastContext';
+import api from '../utils/api';
 import { CreditCard, Smartphone, Landmark, CheckCircle, Loader2 } from 'lucide-react';
 
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   
   // ১. CourseCard থেকে পাঠানো ডাটা রিসিভ করা (Destructuring with fallback)
   const { courseId, courseTitle, price } = location.state || {};
@@ -16,9 +18,9 @@ const Payment = () => {
 
   const handlePayment = async () => {
     // ডাটা ভ্যালিডেশন
-    if (!courseId) return alert("Course information missing! Please go back and try again.");
-    if (!selectedMethod) return alert("Please select a payment method!");
-    if (!user) return alert("Please login first!");
+    if (!courseId) { addToast('Course information missing! Please go back and try again.', { type: 'error' }); return navigate(-1); }
+    if (!selectedMethod) { addToast('Please select a payment method!', { type: 'warning' }); return; }
+    if (!user) { addToast('Please login first!', { type: 'warning' }); return navigate('/login'); }
 
     // ২. ইউজার আইডি ডাইনামিক চেক (id বা user_id যেটা আপনার DB-তে আছে)
     const userId = user.id || user.user_id;
@@ -27,18 +29,18 @@ const Payment = () => {
       setIsProcessing(true);
 
       // ৩. ব্যাকএন্ডে এনরোলমেন্ট রিকোয়েস্ট
-      const response = await axios.post('http://localhost:5000/enroll', {
+      const response = await api.post('/enroll', {
         user_id: userId,
         course_id: courseId
       });
 
       if (response.status === 200) {
-        alert(`🎉 Success! You have enrolled in ${courseTitle}.`);
+        addToast(`🎉 Success! You have enrolled in ${courseTitle}.`, { type: 'success' });
         navigate('/dashboard'); 
       }
     } catch (err) {
       console.error("Enrollment Error:", err);
-      alert(err.response?.data?.message || "Something went wrong! Check if your backend is running.");
+      addToast(err.response?.data?.message || "Something went wrong! Check if your backend is running.", { type: 'error' });
     } finally {
       setIsProcessing(false);
     }
@@ -58,7 +60,7 @@ const Payment = () => {
     <div style={containerStyle}>
       <div style={cardStyle}>
         <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Checkout</h2>
-        <p style={{ textAlign: 'center', color: '#6B7280' }}>
+        <p style={{ textAlign: 'center', color: 'var(--muted)' }}>
           Finalizing purchase for: <br/> <strong>{courseTitle}</strong>
         </p>
         
@@ -69,28 +71,28 @@ const Payment = () => {
         <div style={methodList}>
           {/* bKash */}
           <div 
-            onClick={() => setSelectedMethod('bkash')} 
-            style={{ ...methodItem, borderColor: selectedMethod === 'bkash' ? '#D10056' : '#E5E7EB', background: selectedMethod === 'bkash' ? '#FFF5F8' : '#fff' }}
-          >
-            <Smartphone color="#D10056" />
+              onClick={() => setSelectedMethod('bkash')} 
+              style={{ ...methodItem, borderColor: selectedMethod === 'bkash' ? '#D10056' : 'var(--border)', background: selectedMethod === 'bkash' ? '#FFF5F8' : 'var(--bg)' }}
+            >
+              <Smartphone color="#D10056" />
             <span style={{fontWeight: '500'}}>bKash Payment</span>
           </div>
 
           {/* Bank */}
           <div 
             onClick={() => setSelectedMethod('bank')} 
-            style={{ ...methodItem, borderColor: selectedMethod === 'bank' ? '#4F46E5' : '#E5E7EB', background: selectedMethod === 'bank' ? '#F5F7FF' : '#fff' }}
+            style={{ ...methodItem, borderColor: selectedMethod === 'bank' ? 'var(--primary)' : 'var(--border)', background: selectedMethod === 'bank' ? 'var(--primary-50)' : 'var(--bg)' }}
           >
-            <Landmark color="#4F46E5" />
+            <Landmark color="var(--primary)" />
             <span style={{fontWeight: '500'}}>Bank Transfer</span>
           </div>
 
           {/* Card */}
           <div 
             onClick={() => setSelectedMethod('card')} 
-            style={{ ...methodItem, borderColor: selectedMethod === 'card' ? '#10B981' : '#E5E7EB', background: selectedMethod === 'card' ? '#F0FDF4' : '#fff' }}
+            style={{ ...methodItem, borderColor: selectedMethod === 'card' ? 'var(--success)' : 'var(--border)', background: selectedMethod === 'card' ? '#F0FDF4' : 'var(--bg)' }}
           >
-            <CreditCard color="#10B981" />
+            <CreditCard color="var(--success)" />
             <span style={{fontWeight: '500'}}>Card Payment</span>
           </div>
         </div>
@@ -114,11 +116,11 @@ const Payment = () => {
 };
 
 // --- Styles ---
-const containerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '90vh', background: '#F3F4F6' };
-const cardStyle = { background: '#fff', padding: '40px', borderRadius: '20px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' };
-const priceTag = { textAlign: 'center', fontSize: '30px', fontWeight: 'bold', color: '#4F46E5', margin: '20px 0', padding: '15px', background: '#EEF2FF', borderRadius: '12px' };
+const containerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '90vh', background: 'var(--surface)' };
+const cardStyle = { background: 'var(--bg)', padding: '40px', borderRadius: '20px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' };
+const priceTag = { textAlign: 'center', fontSize: '30px', fontWeight: 'bold', color: 'var(--primary)', margin: '20px 0', padding: '15px', background: 'var(--primary-50)', borderRadius: '12px' };
 const methodList = { display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '25px' };
 const methodItem = { display: 'flex', alignItems: 'center', gap: '15px', padding: '15px', borderRadius: '12px', cursor: 'pointer', border: '2px solid transparent', transition: '0.3s ease' };
-const payBtnStyle = { width: '100%', padding: '15px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' };
+const payBtnStyle = { width: '100%', padding: '15px', background: 'var(--primary)', color: 'var(--bg)', border: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' };
 
 export default Payment;

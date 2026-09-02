@@ -1,22 +1,25 @@
 import React from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { Trash2, ShoppingCart, Eye } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 
 const CourseCard = ({ course, onRefresh }) => {
   // localStorage থেকে ইউজার ডাটা নেওয়া
   const user = JSON.parse(localStorage.getItem('user'));
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleDelete = async (e) => {
     e.stopPropagation(); 
     if (window.confirm("Are you sure you want to delete this course?")) {
       try {
-        await axios.delete(`http://localhost:5000/delete-course/${course.course_id}`);
-        alert("Course Deleted!");
+        await api.delete(`/delete-course/${course.course_id}`);
+        addToast('Course deleted', { type: 'success' });
         onRefresh();
-      } catch (err) {
-        alert("Failed to delete the course.");
+      } catch (error) {
+        console.error(error);
+        addToast('Failed to delete the course', { type: 'error' });
       }
     }
   };
@@ -24,7 +27,7 @@ const CourseCard = ({ course, onRefresh }) => {
   // ৩. Buy Now বাটনের জন্য আপডেট করা ফাংশন
   const handleBuyNow = () => {
     if (!user) {
-      alert("Please login first to buy this course!");
+      addToast('Please login first to buy this course!', { type: 'warning' });
       navigate('/login');
       return;
     }
@@ -40,13 +43,13 @@ const CourseCard = ({ course, onRefresh }) => {
   };
 
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} role="article" aria-label={`Course ${course.title}`}>
       {/* টাইটেল এবং ইমেজ (যদি থাকে) লিঙ্কে রূপান্তর */}
       <Link to={`/course/${course.course_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <h3 style={titleStyle}>{course.title}</h3>
       </Link>
       
-      <p style={{ fontWeight: 'bold', color: '#4F46E5', marginBottom: '10px' }}>{course.price} BDT</p>
+      <p style={{ fontWeight: 'bold', color: 'var(--primary)', marginBottom: '10px' }}>{course.price} BDT</p>
       
       <Link to={`/course/${course.course_id}`} style={viewLinkStyle}>
         <Eye size={14} /> View Details
@@ -57,18 +60,20 @@ const CourseCard = ({ course, onRefresh }) => {
         {/* কন্ডিশন ১: Admin ডিলিট বাটন দেখবে */}
         {user && user.role === 'admin' && (
           <button 
-            onClick={handleDelete}
-            style={{ background: '#EF4444', color: 'white', padding: '8px 12px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
-          >
-            <Trash2 size={16} /> Delete
-          </button>
+              onClick={handleDelete}
+              aria-label={`Delete ${course.title}`}
+              style={{ background: 'var(--danger)', color: 'white', padding: '8px 12px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+            >
+              <Trash2 size={16} /> Delete
+            </button>
         )}
 
         {/* কন্ডিশন ২: Student বা গেস্ট Buy Now বাটন দেখবে */}
         {(!user || user.role === 'student') && (
           <button 
             onClick={handleBuyNow} 
-            style={{ background: '#10B981', color: 'white', padding: '8px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+            aria-label={`Buy ${course.title}`}
+            style={{ background: 'var(--success)', color: 'white', padding: '8px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
           >
             <ShoppingCart size={18} /> Buy Now
           </button>
@@ -81,11 +86,12 @@ const CourseCard = ({ course, onRefresh }) => {
 
 // --- Styles ---
 const cardStyle = {
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   padding: '20px',
   borderRadius: '12px',
-  width: '260px',
-  background: '#fff',
+  width: '100%',
+  maxWidth: '260px',
+  background: 'var(--bg)',
   boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
   transition: 'transform 0.2s',
   cursor: 'pointer'
@@ -94,7 +100,7 @@ const cardStyle = {
 const titleStyle = {
   margin: '0 0 10px 0',
   fontSize: '18px',
-  color: '#1F2937',
+  color: 'var(--text-dark)',
   height: '50px',
   overflow: 'hidden'
 };
@@ -102,7 +108,7 @@ const titleStyle = {
 
 const viewLinkStyle = {
   fontSize: '13px',
-  color: '#4F46E5',
+  color: 'var(--primary)',
   textDecoration: 'none',
   fontWeight: '600',
   display: 'flex',

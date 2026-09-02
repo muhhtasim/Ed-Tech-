@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 import { PlusCircle } from 'lucide-react';
 
 const AddCourse = () => {
   const [course, setCourse] = useState({ title: '', price: '', category: '' });
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/add-course', course);
-      alert("Success! New Course Added.");
+      await api.post('/add-course', course);
+      addToast('Success! New course added.', { type: 'success' });
       navigate('/'); // হোম পেজে নিয়ে যাবে যাতে নতুন কোর্সটি দেখা যায়
-    } catch (err) {
-      alert("Failed to add course.");
+    } catch (error) {
+      console.error(error);
+      addToast('Failed to add course.', { type: 'error' });
     }
   };
 
@@ -22,7 +25,7 @@ const AddCourse = () => {
     <div style={containerStyle}>
       <div style={formCardStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <PlusCircle color="#4F46E5" size={28} />
+          <PlusCircle color="var(--primary)" size={28} />
           <h2 style={{ margin: 0 }}>Add New Course</h2>
         </div>
         
@@ -66,10 +69,10 @@ const AddCourse = () => {
 };
 
 // Styles
-const containerStyle = { display: 'flex', justifyContent: 'center', padding: '50px 5%', background: '#f3f4f6', minHeight: '80vh' };
-const formCardStyle = { background: '#fff', padding: '40px', borderRadius: '15px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', width: '100%', maxWidth: '500px' };
+const containerStyle = { display: 'flex', justifyContent: 'center', padding: '50px 5%', background: 'var(--surface)', minHeight: '80vh' };
+const formCardStyle = { background: 'var(--bg)', padding: '40px', borderRadius: '15px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', width: '100%', maxWidth: '500px' };
 const formStyle = { display: 'flex', flexDirection: 'column', gap: '15px' };
-const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px' };
-const btnStyle = { padding: '14px', background: '#4F46E5', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginTop: '10px' };
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '16px' };
+const btnStyle = { padding: '14px', background: 'var(--primary)', color: 'var(--bg)', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginTop: '10px' };
 
 export default AddCourse;

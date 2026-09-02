@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { useNavigate, Link } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -9,13 +10,14 @@ const Register = () => {
   const [university, setUniversity] = useState(''); // নতুন স্টেট
   const [role, setRole] = useState('student'); 
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     
     try {
       // আমরা এখন university সহ ডাটা পাঠাচ্ছি
-      const res = await axios.post('http://localhost:5000/register', { 
+      await api.post('/register', { 
         name, 
         email, 
         password, 
@@ -23,17 +25,17 @@ const Register = () => {
         university // ব্যাকএন্ডে এটি পাঠানো হচ্ছে
       });
 
-      alert("Registration Successful! Please login.");
+      addToast('Registration successful! Please login.', { type: 'success' });
       navigate('/login');
     } catch (err) {
       console.error(err);
-      alert("Registration Failed! " + (err.response?.data?.error || "Check your details."));
+      addToast("Registration failed! " + (err.response?.data?.error || "Check your details."), { type: 'error' });
     }
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
+    <div className="auth-wrapper">
+      <div className="auth-card">
         <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Register</h2>
         
         <form onSubmit={handleRegister} style={formStyle}>
@@ -83,18 +85,16 @@ const Register = () => {
         </form>
         
         <p style={{ textAlign: 'center', marginTop: '15px' }}>
-          Already have an account? <Link to="/login" style={{ color: '#4F46E5', textDecoration: 'none', fontWeight: 'bold' }}>Login</Link>
+          Already have an account? <Link to="/login" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Login</Link>
         </p>
       </div>
     </div>
   );
 };
 
-// --- Styles (আগের মতোই) ---
-const containerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', background: '#F3F4F6', padding: '20px' };
-const cardStyle = { background: '#fff', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' };
+// --- Styles (partial; layout classes defined in CSS) ---
 const formStyle = { display: 'flex', flexDirection: 'column', gap: '15px' };
-const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid #D1D5DB', fontSize: '16px', outline: 'none', width: '100%', boxSizing: 'border-box' };
-const btnStyle = { padding: '12px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' };
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '16px', outline: 'none', width: '100%', boxSizing: 'border-box' };
+const btnStyle = { padding: '12px', background: 'var(--primary)', color: 'var(--bg)', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' };
 
 export default Register;

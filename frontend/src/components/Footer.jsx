@@ -10,8 +10,8 @@ const Footer = () => {
         {/* ১. ব্র্যান্ড এবং ডেসক্রিপশন */}
         <div style={sectionStyle}>
           <Link to="/" style={logoStyle}>
-            <BookOpen color="#4F46E5" size={28} />
-            <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#1F2937' }}>Ed-Tech</h2>
+            <BookOpen color="var(--primary)" size={28} />
+            <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-dark)' }}>Ed-Tech</h2>
           </Link>
           <p style={textStyle}>
             The best platform to learn modern technologies from industry experts. Start your journey today!
@@ -70,20 +70,20 @@ const Footer = () => {
 };
 
 // --- Styles ---
-const footerStyle = { background: '#fff', borderTop: '1px solid #E5E7EB', padding: '60px 8% 20px 8%', marginTop: '50px' };
+const footerStyle = { background: 'var(--bg)', borderTop: '1px solid var(--border)', padding: '60px 8% 20px 8%', marginTop: '50px' };
 const footerContainer = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px' };
 const sectionStyle = { display: 'flex', flexDirection: 'column', gap: '15px' };
 const logoStyle = { display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' };
-const headingStyle = { fontSize: '18px', fontWeight: 'bold', color: '#111827', marginBottom: '10px' };
-const textStyle = { color: '#6B7280', lineHeight: '1.6', fontSize: '14px' };
+const headingStyle = { fontSize: '18px', fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '10px' };
+const textStyle = { color: 'var(--muted)', lineHeight: '1.6', fontSize: '14px' };
 const ulStyle = { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' };
-const footerLink = { textDecoration: 'none', color: '#4B5563', fontSize: '14px', cursor: 'pointer', transition: '0.3s' };
+const footerLink = { textDecoration: 'none', color: 'var(--muted-2)', fontSize: '14px', cursor: 'pointer', transition: '0.3s' };
 const socialIcons = { display: 'flex', gap: '15px', marginTop: '10px' };
-const iconStyle = { color: '#4F46E5', cursor: 'pointer' };
-const contactItem = { display: 'flex', alignItems: 'center', gap: '10px', color: '#4B5563', fontSize: '14px' };
+const iconStyle = { color: 'var(--primary)', cursor: 'pointer' };
+const contactItem = { display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--muted-2)', fontSize: '14px' };
 const newsletterBox = { display: 'flex', gap: '5px', marginTop: '5px' };
-const inputStyle = { padding: '8px 12px', borderRadius: '5px', border: '1px solid #D1D5DB', width: '100%', outline: 'none' };
-const subscribeBtn = { background: '#4F46E5', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: '600' };
-const bottomFooter = { borderTop: '1px solid #F3F4F6', marginTop: '40px', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#9CA3AF', fontSize: '12px' };
+const inputStyle = { padding: '8px 12px', borderRadius: '5px', border: '1px solid var(--border)', width: '100%', outline: 'none' };
+const subscribeBtn = { background: 'var(--primary)', color: 'var(--bg)', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: '600' };
+const bottomFooter = { borderTop: '1px solid var(--surface)', marginTop: '40px', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--muted-2)', fontSize: '12px' };
 
 export default Footer;
